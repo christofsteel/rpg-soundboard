@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>RPG Soundboard</title>
+
+		<!-- Bootstrap -->
+		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link href="css/soundboard.css" rel="stylesheet">
+
+	</head>
+	<body>
+		<div class="container-fluid">
+			<h1>RPG Soundboard</h1>
+			<div class="row">
+				<div class="col-md-9 col-xs-12 well">
+					<h4>Sounds</h4>
+					<select id='soundsets' class="form-control">
+					</select>
+					<div id='sounds' class="row">
+					</div>
+				</div>
+				<div class="col-md-3 col-xs-12">
+					<div class="well">
+					<h4>Background</h4>
+					<div id='backgrounds' class="list-group">
+					</div>
+					<div class='row'>
+						<div class='col-xs-1'>
+							<span class='glyphicon glyphicon-volume-up'></span>
+						</div>
+						<div class='col-xs-10'>
+							<input id='bg-vol' type='range' min='0' max='100' value='70'></input>
+						</div>
+					</div>
+				</div>
+					<!--<div class="well">
+						<h4>Presets</h4>
+						<select id='presetlist' class="form-control">
+							<option>Battle</option>
+							<option>City</option>
+							<option>Monster</option>
+							<option>Favourite</option>
+						</select>
+						<div class="list-group">
+							<a class="list-group-item">
+								Entrance
+							</a>
+							<a class="list-group-item active">
+								Laboratory
+							</a>
+							<a class="list-group-item">
+								Victory
+							</a>
+						</div>
+					</div>-->
+				</div>
+			</div>
+		</div>
+		<input type="file" id="files" name="files" />
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="js/jquery-2.1.1.min.js"></script>
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/howler.min.js"></script>
+		<script src='js/jszip.min.js'></script>
+		<script src="js/soundboard.min.js"></script>
+	</body>
+</html>

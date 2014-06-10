@@ -1,0 +1,20 @@
+.btn-circle {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  padding: 15px 0;
+  font-size: 12px;
+  line-height: 1.42;
+  border-radius: 25px;
+}
+.slim {
+	padding: 7.5px 15px
+}
+.centerize{
+	text-align: center;
+}
+
+.hidden{
+	display: none;
+}
+
