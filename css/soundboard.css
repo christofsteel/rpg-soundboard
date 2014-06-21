@@ -17,4 +17,6 @@
 .hidden{
 	display: none;
 }
-
+.file-input-name {
+	display: none;
+}

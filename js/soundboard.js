@@ -21,31 +21,32 @@ var app = (function () {
 		this.dom = this.genDom(this.name);
 	};
 	Sound.prototype.setFrequency = function(freq) {
+		console.log('freq: ' + freq);
 		var sound = this;
 		this.frequency = freq;
 		if (this.interval != null) {
 			clearInterval(this.interval);
 		}
 		if (freq > 0 && freq <= 100) {
-			this.interval = setInterval(function(){sound.play()}, (100/freq-1)*1000);
+			this.interval = setInterval(function(){sound.play()}, (1/freq-1)*1000);
 		}
 	};
 	Sound.prototype.setVolume = function(vol) {
 		console.log(this.name + " Volume set to " + vol);
 		this.volume = vol;
-		this.sound.volume(vol/100);
+		this.sound.volume(vol);
 	}
 	Sound.prototype.genDom = function(name){
-			var volslider = $('<input>').attr('type', 'range').attr('min','0').attr('max','100').attr('value',70);
+			this.volslider = $('<input>').addClass('slider col-xs-12').attr('type', 'text').val(0.7);
 			var volsliderlabel = $('<span>').addClass('glyphicon glyphicon-volume-up');
 			var vollabeldiv = $('<div>').addClass('col-xs-2').append(volsliderlabel);
-			var volsliderdiv = $('<div>').addClass('col-xs-9').append(volslider);
+			var volsliderdiv = $('<div>').addClass('col-xs-9').append(this.volslider);
 			var voldiv = $('<div>').addClass('row').append(vollabeldiv).append(volsliderdiv);
 
-			var freqslider = $('<input>').attr('type', 'range').attr('min','0').attr('max','100').attr('value',0);
+			this.freqslider = $('<input>').addClass('slider col-xs-12').attr('type', 'text').val(0.7);
 			var freqsliderlabel = $('<span>').addClass('glyphicon glyphicon-flash');
 			var freqlabeldiv = $('<div>').addClass('col-xs-2').append(freqsliderlabel);
-			var freqsliderdiv = $('<div>').addClass('col-xs-9').append(freqslider);
+			var freqsliderdiv = $('<div>').addClass('col-xs-9').append(this.freqslider);
 			var freqdiv = $('<div>').addClass('row').append(freqlabeldiv).append(freqsliderdiv);
 
 			var symbol = $('<div>').addClass('glyphicon glyphicon-play');
@@ -57,8 +58,6 @@ var app = (function () {
 			a.click(function(){
 				obj.play();
 			});
-			freqslider.change(function(){obj.setFrequency(this.value)});
-			volslider.change(function(){obj.setVolume(this.value)});
 			return div;
 	};
 	Sound.prototype.show = function(){
@@ -70,6 +69,9 @@ var app = (function () {
 	Sound.prototype.play = function(){
 		this.sound.play();
 	};
+	Sound.prototype.stop = function(){
+		this.sound.stop();
+	}
 	// Sound Sets
 	var Soundset = function(name) {
 		this.name = name;
@@ -115,34 +117,83 @@ var app = (function () {
 		var icon = $('<span>').addClass('glyphicon glyphicon-play');
 		var a = $('<a>').attr('href','#').addClass('list-group-item').append(icon).append(" "+name); // Weird Hack, but looks good
 		var loop = this;
-		a.click(function () {
-			if(app.currentloop == loop) {
-				app.currentloop.dom.removeClass('active');
-				app.currentloop.dom.find('.glyphicon').removeClass('glyphicon-stop');
-				app.currentloop.dom.find('.glyphicon').addClass('glyphicon-play');
-				app.currentloop.loop.fadeOut(0,500);
-				app.currentloop = null;
-			} else {
-				if(app.currentloop != null) {
-					app.currentloop.dom.removeClass('active');
-					app.currentloop.dom.find('.glyphicon').removeClass('glyphicon-stop');
-					app.currentloop.dom.find('.glyphicon').addClass('glyphicon-play');
-				}
-				loop.dom.addClass('active');
-				loop.dom.find('.glyphicon').addClass('glyphicon-stop');
-				loop.dom.find('.glyphicon').removeClass('glyphicon-play');
-				loop.start();
-			}
+		a.click(function() {
+			loop.toggle()
 		});
 		return a;
 	};
 	Loop.prototype.start = function() {
-		console.log(this.name + " started");
+		if (app.currentloop == this) {
+			return true;
+		}
 		if(app.currentloop != null) {
-			app.currentloop.loop.fadeOut(0, 3000);
-		} 
+			app.currentloop.stop();
+		}
+		this.dom.addClass('active');
+		this.dom.find('.glyphicon').addClass('glyphicon-stop');
+		this.dom.find('.glyphicon').removeClass('glyphicon-play');
 		app.currentloop = this;
 		app.currentloop.loop.fadeIn(app.volume, 3000);
+	}
+	
+	Loop.prototype.stop = function() {
+		if(app.currentloop == this) {
+			app.currentloop.dom.removeClass('active');
+			app.currentloop.dom.find('.glyphicon').removeClass('glyphicon-stop');
+			app.currentloop.dom.find('.glyphicon').addClass('glyphicon-play');
+			app.currentloop.loop.fadeOut(0, 3000);
+			app.currentloop = null;
+		}
+	}
+
+	Loop.prototype.toggle = function() {
+		if(app.currentloop == this) {
+			this.stop();
+		} else {
+			this.start();
+		}
+	}
+	// Preset Class
+	var Preset = function (o) {
+		var self = this;
+		self.name = o.name;
+		var loopname = o.loop;
+		self.loop = {};
+		app.loops.forEach(function (l) {if(l.name == loopname){self.loop = l}});
+		self.volume = o.volume;
+		self.sounds = [];
+		o.sounds.forEach(function (preset_sound) {
+			app.sounds[preset_sound.set].sounds.forEach(function (s) {
+				if(preset_sound.name == s.name){preset_sound.sound = s};
+			})
+			self.sounds.push(preset_sound);
+		});
+		this.dom = this.genDom();
+	}
+	Preset.prototype.apply = function () {
+		app.volume = this.volume;
+		app.bgvolslider.slider('setValue',app.volume);
+		app.setBGVol(app.volume);
+		this.loop.start();
+		app.sounds["All"].sounds.forEach(function (s) {
+			s.stop();
+			s.freqslider.slider('setValue', 0);
+			s.freqslider.setFrequency(0);
+		});
+		this.sounds.forEach(function (s) {
+			s.sound.freqslider.slider('setValue', s.freq);
+			s.setFrequency(s.freq);
+			s.sound.volslider.slider('setValue', s.volume);
+			s.setVolume(s.volume);
+		});
+	};
+	Preset.prototype.genDom = function () {
+		var self = this;
+		var a = $('<a>').addClass('list-group-item').text(this.name);
+		a.click(function () {
+			self.apply();
+		})
+		return a;
 	}
 	// End Classes
 	//
@@ -151,7 +202,6 @@ var app = (function () {
 		var loops = zip.file(/^loops\/[^\/]*$/); // get all files in loop folder
 		loops.forEach(function (loop) {
 			var name = loop.name.replace(/loops\//, '');
-			console.log('Added loop '+name);
 			var soundloop = new Loop({name: name, buffer: loop.asArrayBuffer()});
 			app.loops.push(soundloop);
 			app.loopcontainer.append(soundloop.dom);
@@ -168,10 +218,31 @@ var app = (function () {
 				app.sounds["All"].sounds.push(audiosound);
 				app.sounds[soundsetname].sounds.push(audiosound);
 				app.soundsContainer.append(audiosound.dom);
+				audiosound.freqslider.slider({min:0,max:1,step:0.01,value:0.0,orientation:"horizontal",selection:"before",tooltip:"hide"});
+				audiosound.freqslider.slider().on('slide', function(ev){
+					var freq = ev.value
+					audiosound.setFrequency(freq)});
+				audiosound.volslider.slider({min:0,max:1,step:0.01,value:0.7,orientation:"horizontal",selection:"before",tooltip:"hide"});
+				audiosound.volslider.slider().on('slide', function(ev){
+					var volume = ev.value
+					audiosound.setVolume(volume)});
 			});
 			app.sounds["All"].dom.onSelect();
 		});
-	};
+		var presets = JSON.parse(zip.file(/^presets.js/)[0].asText());
+		presets.settings.forEach(function (presetdata) {
+			var p = new Preset(presetdata);
+			app.presetContainer.append(p.dom);
+			app.preset.push(p);
+		});
+	}
+
+	var setBGVol = function(vol) {
+		app.volume = vol;
+		if(app.currentloop != null) {
+			app.currentloop.loop.volume(app.volume);
+		}
+	}
 
 	var initialize = function() {
 		// First initialize the soundboard
@@ -192,23 +263,27 @@ var app = (function () {
 		app.volume = 0.7;
 		app.currentloop = null;
 		app.loopcontainer = $('#backgrounds');
-		var bgvol = $('#bg-vol');
-		bgvol.change(function() {
-			console.log("BG Volume:" + this.value); 
-			app.volume = this.value / 100;
-			if(app.currentloop != null) {
-				app.currentloop.loop.volume(app.volume);
-			}
+		app.bgvolslider = $('#bg-vol').slider('getValue')
+		app.bgvolslider.slider().on('slide', function(ev) {
+			var vol = ev.value
+			app.setBGVol(vol)
 		});
+
+		// Finaly initialize the presets
+		app.presetContainer = $('#presets')
+		app.preset = []
+
 		// Handling the files
-		var fileuploader = $('#files');
+		var fileuploader = $('#file');
 		fileuploader.change(function(evt) {
 			var file = evt.target.files[0];
 			var reader = new FileReader();
 			reader.onload = handleZip;
 			reader.readAsArrayBuffer(file);
+			fileuploader.wrap('<form>').closest('form').get(0).reset();
+			fileuploader.unwrap();
 		});
 	};
-	return{initialize: initialize, Sound: Sound, Soundset: Soundset, sounds: sounds, Loop: Loop};
+	return{initialize: initialize, setBGVol: setBGVol, Preset: Preset, Sound: Sound, Soundset: Soundset, sounds: sounds, Loop: Loop};
 })();
 app.initialize();

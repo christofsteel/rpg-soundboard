@@ -9,11 +9,17 @@
 		<!-- Bootstrap -->
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<link href="css/soundboard.css" rel="stylesheet">
+		<link href="css/slider.css" rel="stylesheet">
 
 	</head>
 	<body>
 		<div class="container-fluid">
 			<h1>RPG Soundboard</h1>
+			<input type="file" id="file" data-label="Add ZIP" name="file" />
+			<a href="#" class="btn btn-primary" role="button">Add Soundset</a>
+			<input type="file" id="add_sound" data-label="Add Sound" name="file" />
+			<input type="file" id="add_bg" data-label="Add Background" name="file" />
+			<a href="#" class="btn btn-primary" role="button">Download ZIP</a>
 			<div class="row">
 				<div class="col-md-9 col-xs-12 well">
 					<h4>Sounds</h4>
@@ -32,40 +38,30 @@
 							<span class='glyphicon glyphicon-volume-up'></span>
 						</div>
 						<div class='col-xs-10'>
-							<input id='bg-vol' type='range' min='0' max='100' value='70'></input>
+							<input type="text" id='bg-vol' class="slider col-xs-12" value="0.7" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="hide"></input>
 						</div>
 					</div>
 				</div>
-					<!--<div class="well">
+					<div class="well">
 						<h4>Presets</h4>
-						<select id='presetlist' class="form-control">
-							<option>Battle</option>
-							<option>City</option>
-							<option>Monster</option>
-							<option>Favourite</option>
-						</select>
-						<div class="list-group">
-							<a class="list-group-item">
-								Entrance
-							</a>
-							<a class="list-group-item active">
-								Laboratory
-							</a>
-							<a class="list-group-item">
-								Victory
-							</a>
+						<div id="presets" class="list-group">
 						</div>
-					</div>-->
+					</div>
 				</div>
 			</div>
 		</div>
-		<input type="file" id="files" name="files" />
 		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 		<script src="js/jquery-2.1.1.min.js"></script>
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="js/bootstrap.min.js"></script>
+		<script src="js/bootstrap.file-input.js"></script>
+		<script src="js/bootstrap-slider.js"></script>
 		<script src="js/howler.min.js"></script>
 		<script src='js/jszip.min.js'></script>
-		<script src="js/soundboard.min.js"></script>
+		<script src="js/soundboard.js"></script>
+		<script>
+			$('#bg-vol').slider()
+			$('input[type=file]').bootstrapFileInput();
+		</script>
 	</body>
 </html>
