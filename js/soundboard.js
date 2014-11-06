@@ -82,6 +82,7 @@ var app = (function () {
 			var option = $('<option>').text(name);
 			var obj = this;
 			option.onSelect = function() {
+				app.soundset = name;
 				console.log("Changed to " + name);
 				app.sounds.All.sounds.forEach(function(sound){
 					sound.hide();
@@ -114,13 +115,39 @@ var app = (function () {
 		console.log(this.name + " loaded");
 	};
 	Loop.prototype.genDom = function(name) {
-		var icon = $('<span>').addClass('glyphicon glyphicon-play');
-		var a = $('<a>').attr('href','#').addClass('list-group-item').append(icon).append(" "+name); // Weird Hack, but looks good
+		/*<div class="input-group">
+			<div class="input-group-btn">
+			<a href="#" role="button" class="btn btn-default"><span class="glyphicon glyphicon-play"></span></a>
+			</div>
+			<input type="text" class="form-control" value="NAME" />
+			<div class="input-group-btn">
+			<a href="#" role="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></a>
+			</div>
+		</div> */
+		var input_group = $("<div>").addClass('input-group');
+		var play_group = $("<div>").addClass('input-group-btn');
+		var play_button = $("<a>").addClass('bg-play-btn btn btn-default').attr("href", "#").attr("role", "button");
+		var play_icon = $('<span>').addClass('glyphicon glyphicon-play');
+		var input_text = $('<input>').addClass('form-control').attr("disabled","disabled").attr('style','cursor:auto; background-color:white;').attr("type", "text").val(name);
+		var remove_group = $("<div>").addClass('input-group-btn');
+		var remove_button = $("<a>").addClass('btn btn-danger').attr("href", "#").attr("role", "button");
+		var remove_icon = $('<span>').addClass('glyphicon glyphicon-trash');
+
+		input_group.append(play_group).append(input_text).append(remove_group);
+		play_group.append(play_button);
+		play_button.append(play_icon);
+		remove_group.append(remove_button);
+		remove_button.append(remove_icon);
+
+		//var a = $('<a>').attr('href','#').addClass('list-group-item').append(icon).append(" "+name); // Weird Hack, but looks good
 		var loop = this;
-		a.click(function() {
-			loop.toggle()
+		play_button.click(function() {
+			loop.toggle();
 		});
-		return a;
+		remove_button.click(function() {
+			loop.remove();
+		});
+		return input_group;
 	};
 	Loop.prototype.start = function() {
 		if (app.currentloop == this) {
@@ -129,21 +156,27 @@ var app = (function () {
 		if(app.currentloop != null) {
 			app.currentloop.stop();
 		}
-		this.dom.addClass('active');
-		this.dom.find('.glyphicon').addClass('glyphicon-stop');
-		this.dom.find('.glyphicon').removeClass('glyphicon-play');
+		this.dom.find('.bg-play-btn').removeClass('btn-default').addClass('btn-primary');
+		this.dom.find('.bg-play-btn span').addClass('glyphicon-stop').removeClass('glyphicon-play');
 		app.currentloop = this;
 		app.currentloop.loop.fadeIn(app.volume, 3000);
 	}
 	
 	Loop.prototype.stop = function() {
 		if(app.currentloop == this) {
-			app.currentloop.dom.removeClass('active');
-			app.currentloop.dom.find('.glyphicon').removeClass('glyphicon-stop');
-			app.currentloop.dom.find('.glyphicon').addClass('glyphicon-play');
+			app.currentloop.dom.find('.bg-play-btn').removeClass('btn-primary').addClass('btn-default');
+			app.currentloop.dom.find('.bg-play-btn span').removeClass('glyphicon-stop').addClass('glyphicon-play');
 			app.currentloop.loop.fadeOut(0, 3000);
 			app.currentloop = null;
 		}
+	}
+	Loop.prototype.remove = function() {
+		if(app.currentloop == this) {
+			this.stop();
+		}
+		this.dom.remove();
+		index = app.loops.indexOf(this);
+		app.loops.splice(index, 1);
 	}
 
 	Loop.prototype.toggle = function() {
@@ -172,19 +205,22 @@ var app = (function () {
 	}
 	Preset.prototype.apply = function () {
 		app.volume = this.volume;
-		app.bgvolslider.slider('setValue',app.volume);
-		app.setBGVol(app.volume);
-		this.loop.start();
+		if(this.loop) {
+			app.bgvolslider.slider('setValue',app.volume);
+			app.setBGVol(app.volume);
+			this.loop.start();
+		}
 		app.sounds["All"].sounds.forEach(function (s) {
+			console.log(s)
 			s.stop();
 			s.freqslider.slider('setValue', 0);
-			s.freqslider.setFrequency(0);
+			s.setFrequency(0);
 		});
 		this.sounds.forEach(function (s) {
 			s.sound.freqslider.slider('setValue', s.freq);
-			s.setFrequency(s.freq);
+			s.sound.setFrequency(s.freq);
 			s.sound.volslider.slider('setValue', s.volume);
-			s.setVolume(s.volume);
+			s.sound.setVolume(s.volume);
 		});
 	};
 	Preset.prototype.genDom = function () {
@@ -197,6 +233,31 @@ var app = (function () {
 	}
 	// End Classes
 	//
+	var handleSounds = function(file) {return function(e) {
+		var filename = file.name
+		var audiosound = new Sound({name: filename, buffer: e.target.result});
+		app.sounds["All"].sounds.push(audiosound);
+		app.sounds[app.soundset].sounds.push(audiosound);
+		app.soundsContainer.append(audiosound.dom);
+		audiosound.freqslider.slider({min:0,max:1,step:0.01,value:0.0,orientation:"horizontal",selection:"before",tooltip:"hide"});
+		audiosound.freqslider.slider().on('slide', function(ev){
+			var freq = ev.value
+			audiosound.setFrequency(freq)});
+		audiosound.volslider.slider({min:0,max:1,step:0.01,value:0.7,orientation:"horizontal",selection:"before",tooltip:"hide"});
+		audiosound.volslider.slider().on('slide', function(ev){
+			var volume = ev.value
+			audiosound.setVolume(volume)});
+		console.log("Added " + filename + " to " + app.soundset);
+		app.sounds[app.soundset].dom.onSelect();
+	};};
+
+	var handleBackground = function(file) {return function(e) {
+		console.log(file)
+		var filename = file.name
+		var audiosound = new Loop({name: filename, buffer: e.target.result});
+		app.loops.push(audiosound);
+		app.loopcontainer.append(audiosound.dom);
+	};};
 	var handleZip = function(e) {
 		var zip = new JSZip(e.target.result);
 		var loops = zip.file(/^loops\/[^\/]*$/); // get all files in loop folder
@@ -255,6 +316,7 @@ var app = (function () {
 
 		app.sounds = {};
 
+		app.soundset = "All"
 		app.sounds["All"] = new Soundset("All");
 		app.soundsetsContainer.append(app.sounds["All"].dom);
 
@@ -274,14 +336,110 @@ var app = (function () {
 		app.preset = []
 
 		// Handling the files
-		var fileuploader = $('#file');
-		fileuploader.change(function(evt) {
+		var zipuploader = $('#add_zip');
+		zipuploader.change(function(evt) {
 			var file = evt.target.files[0];
 			var reader = new FileReader();
 			reader.onload = handleZip;
 			reader.readAsArrayBuffer(file);
-			fileuploader.wrap('<form>').closest('form').get(0).reset();
-			fileuploader.unwrap();
+			zipuploader.wrap('<form>').closest('form').get(0).reset();
+			zipuploader.unwrap();
+		});
+		$('#add_soundset').click(function(evt) {
+			var soundset_name = prompt('Soundset Name:', 'New Soundset');
+			if(app.sounds[soundset_name]) {
+				alert("Soundset already exists");
+			} else {
+				if(soundset_name == "" || soundset_name == null) {
+					alert("Please enter a name")
+				} else {
+					app.sounds[soundset_name] = new Soundset(soundset_name);
+					app.soundsetsContainer.append(app.sounds[soundset_name].dom);
+					app.sounds[soundset_name].dom.onSelect();
+					app.soundsetsContainer.val(soundset_name);
+					console.log("Created Soundset " + soundset_name);
+				}
+			}
+		});
+		var soundsuploader = $('#add_sound');
+		soundsuploader.change(function(evt) {
+			var file = evt.target.files[0];
+			var reader = new FileReader();
+			reader.onload = handleSounds(file);
+			reader.readAsArrayBuffer(file);
+			zipuploader.wrap('<form>').closest('form').get(0).reset();
+			zipuploader.unwrap();
+		});
+		var backgrounduploader = $('#add_background');
+		backgrounduploader.change(function(evt) {
+			var file = evt.target.files[0];
+			var reader = new FileReader();
+			reader.onload = handleBackground(file);
+			reader.readAsArrayBuffer(file);
+			backgrounduploader.wrap('<form>').closest('form').get(0).reset();
+			backgrounduploader.unwrap();
+		});
+		$('#add_preset').click(function(evt){
+			var presetname = prompt("Preset name", "New Preset");
+			var sounds = [];
+			for (set in app.sounds) {
+				if (set != "All") {
+					for(sound in app.sounds[set].sounds) {
+						if(app.sounds[set].sounds[sound].frequency > 0) {
+							sounds.push({
+								set: set,
+								name: app.sounds[set].sounds[sound].name,
+								freq: app.sounds[set].sounds[sound].frequency,
+								volume: app.sounds[set].sounds[sound].volume
+							});
+						}
+					}
+				}
+			}
+			var loop = ""
+			if(app.currentloop){
+				loop = app.currentloop.name;
+			} 
+			var p = new Preset({name: presetname, 
+				loop: loop,
+				volume: app.volume,
+				sounds: sounds
+				});
+			app.presetContainer.append(p.dom);
+			app.preset.push(p);
+		});
+		$('#dl_zip').click(function(evt){
+			var zip = new JSZip();
+			var presetJSON = {'settings': []}
+			app.preset.forEach(function(p){
+				var pjson = {}
+				pjson.name = p.name;
+				pjson.loop =  p.loop.name;
+				pjson.volume = p.loop.volume;
+				pjson.sounds = [];
+				p.sounds.forEach(function(s){
+					var sjson = {}
+					sjson.set = s.set;
+					sjson.name = s.name;
+					sjson.freq = s.frequency;
+					sjson.volume = s.volume;
+					pjson.sounds.push(sjson)
+				});
+				presetJSON.settings.push(pjson);
+			});
+			zip.file("presets.js",JSON.stringify(presetJSON));
+			app.loops.forEach(function(l){
+				zip.file("loops/" + l.name, l.buffer)
+			});
+			for(set in app.sounds){
+				if(set != "All") {
+					app.sounds[set].sounds.forEach(function(s){
+						zip.file("sounds/" + set + "/" + s.name,s.buffer);
+					});
+				}
+			}
+			var content = zip.generate({type:"blob"});
+			saveAs(content)
 		});
 	};
 	return{initialize: initialize, setBGVol: setBGVol, Preset: Preset, Sound: Sound, Soundset: Soundset, sounds: sounds, Loop: Loop};

@@ -7,8 +7,14 @@
   line-height: 1.42;
   border-radius: 25px;
 }
+body {
+	background-color: #444444;
+}
 .slim {
 	padding: 7.5px 15px
+}
+.rightize{
+	text-align: right !important;
 }
 .centerize{
 	text-align: center;
@@ -19,4 +25,14 @@
 }
 .file-input-name {
 	display: none;
+}
+
+.fullwidth {
+	width: 100%;
+}
+.bg-btn {
+}
+.bg-text {
+	overflow: hidden;
+	text-overflow: ellipses;
 }
