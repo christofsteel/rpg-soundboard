@@ -362,6 +362,32 @@ var app = (function () {
 			app.setBGVol(vol)
 		});
 
+		// Global Volume control
+		app.volslider = $('#vol');
+		app.volslider.slider().on('slide', function(ev) {
+			var vol = ev.value;
+			$('#mute_button').removeClass('glyphicon-volume-off').addClass('glyphicon-volume-up');
+			Howler.volume(vol);
+			if (vol == 0) {
+				$('#mute_button').removeClass('glyphicon-volume-up').addClass('glyphicon-volume-off');
+				Howler.mute()
+			}
+		});
+
+		app.mutebutton = $('#mute_button');
+		app.mutebutton.click(function () {
+			if (Howler._muted) {
+				console.log('unmute');
+				$('#mute_button').removeClass('glyphicon-volume-off').addClass('glyphicon-volume-up');
+				Howler.unmute();
+			} else {
+				console.log('mute');
+				$('#mute_button').removeClass('glyphicon-volume-up').addClass('glyphicon-volume-off');
+				Howler.mute();
+			}
+		});
+
+
 		// Finaly initialize the presets
 		app.presetContainer = $('#presets')
 		app.preset = []
