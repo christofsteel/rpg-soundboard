@@ -27,12 +27,17 @@ body {
 	display: none;
 }
 
-.fullwidth {
-	width: 100%;
+.fullwidth .slider {
+	width: 100% !important;
 }
 .bg-btn {
 }
 .bg-text {
 	overflow: hidden;
 	text-overflow: ellipses;
+}
+.soundLabel {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

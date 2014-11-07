@@ -39,20 +39,21 @@ var app = (function () {
 	Sound.prototype.genDom = function(name){
 			this.volslider = $('<input>').addClass('slider col-xs-12').attr('type', 'text').val(0.7);
 			var volsliderlabel = $('<span>').addClass('glyphicon glyphicon-volume-up');
-			var vollabeldiv = $('<div>').addClass('col-xs-2').append(volsliderlabel);
-			var volsliderdiv = $('<div>').addClass('col-xs-8').append(this.volslider);
+			var vollabeldiv = $('<div>').addClass('col-sm-2 col-xs-12').append(volsliderlabel);
+			var volsliderdiv = $('<div>').addClass('col-sm-10 col-xs-12 fullwidth').append(this.volslider);
 			var voldiv = $('<div>').addClass('row').append(vollabeldiv).append(volsliderdiv);
 
+			
 			this.freqslider = $('<input>').addClass('slider col-xs-12').attr('type', 'text').val(0.7);
 			var freqsliderlabel = $('<span>').addClass('glyphicon glyphicon-flash');
-			var freqlabeldiv = $('<div>').addClass('col-xs-2').append(freqsliderlabel);
-			var freqsliderdiv = $('<div>').addClass('col-xs-8').append(this.freqslider);
+			var freqlabeldiv = $('<div>').addClass('col-sm-2 col-xs-12').append(freqsliderlabel);
+			var freqsliderdiv = $('<div>').addClass('col-sm-10 col-xs-12 fullwidth').append(this.freqslider);
 			var freqdiv = $('<div>').addClass('row').append(freqlabeldiv).append(freqsliderdiv);
 
 			var symbol = $('<div>').addClass('glyphicon glyphicon-play');
 			var span = $('<div>').addClass('soundLabel').text(name);
 			var a = $('<a>').addClass('btn btn-success btn-circle').append(symbol);
-			var div = $('<div>').addClass('col-xs-4 col-sm-3 col-md-2 centerize slim hidden')
+			var div = $('<div>').addClass('col-xs-6 col-sm-4 col-md-3 centerize slim hidden')
 				.append(a).append(span).append(freqdiv).append(voldiv);
 			var obj = this; 
 			a.click(function(){
@@ -355,7 +356,7 @@ var app = (function () {
 		app.volume = 0.7;
 		app.currentloop = null;
 		app.loopcontainer = $('#backgrounds');
-		app.bgvolslider = $('#bg-vol').slider('getValue')
+		app.bgvolslider = $('#bg-vol')
 		app.bgvolslider.slider().on('slide', function(ev) {
 			var vol = ev.value
 			app.setBGVol(vol)
