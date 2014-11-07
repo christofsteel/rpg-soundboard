@@ -40,19 +40,19 @@ var app = (function () {
 			this.volslider = $('<input>').addClass('slider col-xs-12').attr('type', 'text').val(0.7);
 			var volsliderlabel = $('<span>').addClass('glyphicon glyphicon-volume-up');
 			var vollabeldiv = $('<div>').addClass('col-xs-2').append(volsliderlabel);
-			var volsliderdiv = $('<div>').addClass('col-xs-9').append(this.volslider);
+			var volsliderdiv = $('<div>').addClass('col-xs-8').append(this.volslider);
 			var voldiv = $('<div>').addClass('row').append(vollabeldiv).append(volsliderdiv);
 
 			this.freqslider = $('<input>').addClass('slider col-xs-12').attr('type', 'text').val(0.7);
 			var freqsliderlabel = $('<span>').addClass('glyphicon glyphicon-flash');
 			var freqlabeldiv = $('<div>').addClass('col-xs-2').append(freqsliderlabel);
-			var freqsliderdiv = $('<div>').addClass('col-xs-9').append(this.freqslider);
+			var freqsliderdiv = $('<div>').addClass('col-xs-8').append(this.freqslider);
 			var freqdiv = $('<div>').addClass('row').append(freqlabeldiv).append(freqsliderdiv);
 
 			var symbol = $('<div>').addClass('glyphicon glyphicon-play');
 			var span = $('<div>').addClass('soundLabel').text(name);
-			var a = $('<a>').addClass('btn btn-default btn-circle').append(symbol);
-			var div = $('<div>').addClass('col-xs-4 col-sm-2 centerize slim hidden')
+			var a = $('<a>').addClass('btn btn-success btn-circle').append(symbol);
+			var div = $('<div>').addClass('col-xs-4 col-sm-3 col-md-2 centerize slim hidden')
 				.append(a).append(span).append(freqdiv).append(voldiv);
 			var obj = this; 
 			a.click(function(){
@@ -126,7 +126,7 @@ var app = (function () {
 		</div> */
 		var input_group = $("<div>").addClass('input-group');
 		var play_group = $("<div>").addClass('input-group-btn');
-		var play_button = $("<a>").addClass('bg-play-btn btn btn-default').attr("href", "#").attr("role", "button");
+		var play_button = $("<a>").addClass('bg-play-btn btn btn-success').attr("href", "#").attr("role", "button");
 		var play_icon = $('<span>').addClass('glyphicon glyphicon-play');
 		var input_text = $('<input>').addClass('form-control').attr("disabled","disabled").attr('style','cursor:auto; background-color:white;').attr("type", "text").val(name);
 		var remove_group = $("<div>").addClass('input-group-btn');
@@ -156,7 +156,7 @@ var app = (function () {
 		if(app.currentloop != null) {
 			app.currentloop.stop();
 		}
-		this.dom.find('.bg-play-btn').removeClass('btn-default').addClass('btn-primary');
+		this.dom.find('.bg-play-btn').removeClass('btn-success').addClass('btn-primary');
 		this.dom.find('.bg-play-btn span').addClass('glyphicon-stop').removeClass('glyphicon-play');
 		app.currentloop = this;
 		app.currentloop.loop.fadeIn(app.volume, 3000);
@@ -164,7 +164,7 @@ var app = (function () {
 	
 	Loop.prototype.stop = function() {
 		if(app.currentloop == this) {
-			app.currentloop.dom.find('.bg-play-btn').removeClass('btn-primary').addClass('btn-default');
+			app.currentloop.dom.find('.bg-play-btn').removeClass('btn-primary').addClass('btn-success');
 			app.currentloop.dom.find('.bg-play-btn span').removeClass('glyphicon-stop').addClass('glyphicon-play');
 			app.currentloop.loop.fadeOut(0, 3000);
 			app.currentloop = null;
@@ -177,6 +177,7 @@ var app = (function () {
 		this.dom.remove();
 		index = app.loops.indexOf(this);
 		app.loops.splice(index, 1);
+		delete this.buffer;
 	}
 
 	Loop.prototype.toggle = function() {
@@ -211,25 +212,55 @@ var app = (function () {
 			this.loop.start();
 		}
 		app.sounds["All"].sounds.forEach(function (s) {
-			console.log(s)
 			s.stop();
 			s.freqslider.slider('setValue', 0);
 			s.setFrequency(0);
 		});
 		this.sounds.forEach(function (s) {
+			console.log(s)
 			s.sound.freqslider.slider('setValue', s.freq);
 			s.sound.setFrequency(s.freq);
 			s.sound.volslider.slider('setValue', s.volume);
 			s.sound.setVolume(s.volume);
 		});
 	};
+	Preset.prototype.remove = function () {
+		this.dom.remove();
+		index = app.preset.indexOf(this);
+		app.preset.splice(index, 1);
+	};
 	Preset.prototype.genDom = function () {
+		/*<div class="input-group">
+			<div class="input-group-btn">
+			<a href="#" role="button" class="btn btn-success"><span class="glyphicon glyphicon-chevron-left"></span></a>
+			</div>
+			<input type="text" class="form-control btn btn-default" disabled value="NAME" />
+			<div class="input-group-btn">
+			<a href="#" role="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></a>
+			</div>
+		</div>*/
+		var input_group = $('<div>').addClass("input-group");
+		var apply_group = $("<div>").addClass('input-group-btn');
+		var apply_button = $("<a>").addClass('btn btn-success').attr("href", "#").attr("role", "button");
+		var apply_icon = $('<span>').addClass('glyphicon glyphicon-chevron-left');
+		var input_text = $('<input>').addClass('form-control').attr("disabled","disabled").attr('style','cursor:auto; background-color:white;').attr("type", "text").val(this.name);
+		var remove_group = $("<div>").addClass('input-group-btn');
+		var remove_button = $("<a>").addClass('btn btn-danger').attr("href", "#").attr("role", "button");
+		var remove_icon = $('<span>').addClass('glyphicon glyphicon-trash');
+
+		input_group.append(apply_group).append(input_text).append(remove_group);
+		apply_group.append(apply_button);
+		apply_button.append(apply_icon);
+		remove_group.append(remove_button);
+		remove_button.append(remove_icon);
 		var self = this;
-		var a = $('<a>').addClass('list-group-item').text(this.name);
-		a.click(function () {
+		apply_button.click(function () {
 			self.apply();
-		})
-		return a;
+		});
+		remove_button.click(function () {
+			self.remove();
+		});
+		return input_group;
 	}
 	// End Classes
 	//
@@ -252,7 +283,6 @@ var app = (function () {
 	};};
 
 	var handleBackground = function(file) {return function(e) {
-		console.log(file)
 		var filename = file.name
 		var audiosound = new Loop({name: filename, buffer: e.target.result});
 		app.loops.push(audiosound);
@@ -403,7 +433,7 @@ var app = (function () {
 			var p = new Preset({name: presetname, 
 				loop: loop,
 				volume: app.volume,
-				sounds: sounds
+				sounds: sounds,
 				});
 			app.presetContainer.append(p.dom);
 			app.preset.push(p);
@@ -415,13 +445,13 @@ var app = (function () {
 				var pjson = {}
 				pjson.name = p.name;
 				pjson.loop =  p.loop.name;
-				pjson.volume = p.loop.volume;
+				pjson.volume = p.volume;
 				pjson.sounds = [];
 				p.sounds.forEach(function(s){
 					var sjson = {}
 					sjson.set = s.set;
 					sjson.name = s.name;
-					sjson.freq = s.frequency;
+					sjson.freq = s.freq;
 					sjson.volume = s.volume;
 					pjson.sounds.push(sjson)
 				});

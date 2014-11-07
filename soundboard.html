@@ -26,18 +26,20 @@
 				</div>
 			</nav>
 			<div class="row">
-				<div class="col-md-8 col-xs-12">
+				<div class="col-sm-8 col-md-9 col-xs-12">
 					<div class="well">
 						<h4>Sounds</h4>
 						<div class="input-group">
+							<div class="input-group-btn">
+								<a href="#" id="add_soundset" class="btn btn-primary" role="button">
+									<span class="glyphicon glyphicon-plus"></span>
+								</a>
+							</div>
 							<select id='soundsets' class="form-control">
 							</select>
 							<div class="input-group-btn">
 								<a href="#" id="rename_soundset" class="btn btn-primary" role="button">
 									<span class="glyphicon glyphicon-pencil"></span>
-								</a>
-								<a href="#" id="add_soundset" class="btn btn-primary" role="button">
-									<span class="glyphicon glyphicon-plus"></span>
 								</a>
 								<a href="#" id="rename_soundset" class="btn btn-danger" role="button">
 									<span class="glyphicon glyphicon-remove"></span>
@@ -45,14 +47,14 @@
 							</div>
 						</div>
 						<div id='sounds' class="row">
-							<div class="col-xs-4 col-sm-2 centerize slim">
+							<div class="col-xs-4 col-sm-3 col-md-2 centerize slim">
 								<input type="file" id="add_sound" name="file" class="btn btn-primary btn-circle glyphicon glyphicon-plus" />
 								<div class="soundLabel"><br />Add Sound</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-md-4 col-xs-12">
+				<div class="col-sm-4 col-md-3 col-xs-12">
 					<div class="well">
 					<h4>Background</h4>
 					<div id='backgrounds'>
@@ -69,8 +71,8 @@
 				</div>
 					<div class="well">
 						<h4>Presets</h4>
-						<div id="presets" class="list-group">
-							<a href="#" id="add_preset" role="button" class="list-group-item active centerize">Add Preset</a>
+						<div id="presets">
+							<a href="#" id="add_preset" role="button" class="btn-primary btn btn-block centerize">Add Preset</a>
 						</div>
 					</div>
 				</div>
