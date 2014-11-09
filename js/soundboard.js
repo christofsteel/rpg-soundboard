@@ -289,9 +289,12 @@ var app = (function () {
 		app.loops.push(audiosound);
 		app.loopcontainer.append(audiosound.dom);
 	};};
-	var handleZip = function(e) {
+	var handleZip = function(file) { return function(e) {
 		var zip = new JSZip(e.target.result);
 		var loops = zip.file(/^loops\/[^\/]*$/); // get all files in loop folder
+		var name = file.name.replace(/\.zip$/,'');
+
+		$("#name").val(name);
 		loops.forEach(function (loop) {
 			var name = loop.name.replace(/loops\//, '');
 			var soundloop = new Loop({name: name, buffer: loop.asArrayBuffer()});
@@ -327,7 +330,7 @@ var app = (function () {
 			app.presetContainer.append(p.dom);
 			app.preset.push(p);
 		});
-	}
+	};}
 
 	var setBGVol = function(vol) {
 		app.volume = vol;
@@ -397,7 +400,7 @@ var app = (function () {
 		zipuploader.change(function(evt) {
 			var file = evt.target.files[0];
 			var reader = new FileReader();
-			reader.onload = handleZip;
+			reader.onload = handleZip(file);
 			reader.readAsArrayBuffer(file);
 			zipuploader.wrap('<form>').closest('form').get(0).reset();
 			zipuploader.unwrap();
@@ -496,7 +499,11 @@ var app = (function () {
 				}
 			}
 			var content = zip.generate({type:"blob"});
-			saveAs(content)
+			var name = $("#name").val();
+			if(name == "") {
+				name = "soundboard"
+			}
+			saveAs(content, name + ".zip")
 		});
 	};
 	return{initialize: initialize, setBGVol: setBGVol, Preset: Preset, Sound: Sound, Soundset: Soundset, sounds: sounds, Loop: Loop};

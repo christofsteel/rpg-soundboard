@@ -14,14 +14,21 @@
 	</head>
 	<body>
 		<div class="container-fluid">
-			<nav class="navbar navbar-inverse" role="navigation">
+			<nav class="navbar navbar-inverse" style="text-align: center" role="navigation">
 				<div class="container-fluid">
-					<a class="navbar-brand">RPG Soundboard v0.1</a>
-					<input type="file" id="add_zip" class="navbar-btn btn glyphicon glyphicon-folder-open" data-label="<br/>Open" name="file" />
-					<a href="#" id="dl_zip" class="btn navbar-btn glyphicon glyphicon-floppy-save" role="button"><br/>Save</a>
+					<a class="navbar-brand navbar-left">RPG Soundboard</a>
+					<div class="btn-group navbar-left">
+						<input type="file" id="add_zip" class="navbar-btn btn glyphicon glyphicon-folder-open" data-label="<br/>Open" name="file" />
+						<a href="#" id="dl_zip" class="btn navbar-btn glyphicon glyphicon-floppy-save" role="button"><br/>Save</a>
+					</div>
 					<div class="navbar-right navbar-form">
 						<a href="#" id="mute_button" class='navbar-btn btn glyphicon glyphicon-volume-up'></a>
-						<input type="text" id='vol' class="slider col-xs-12" value="0.7" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="hide"></input>
+						<input type="text" id='vol' class="slider col-xs-12" value="0.7" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="hide" />
+					</div>
+					<div style="width:20rem; margin: 0 auto;">
+						<div class="form-group navbar-text centerize form-group-sm">
+							<input type="text" id="name" class="form-control" style="background-color:#333;border-color:#000; color: #ddd; text-align: center;" value="soundboard"/>
+						</div>
 					</div>
 				</div>
 			</nav>
@@ -41,7 +48,7 @@
 								<a href="#" id="rename_soundset" class="btn btn-primary" role="button">
 									<span class="glyphicon glyphicon-pencil"></span>
 								</a>
-								<a href="#" id="rename_soundset" class="btn btn-danger" role="button">
+								<a href="#" id="remove_soundset" class="btn btn-danger" role="button">
 									<span class="glyphicon glyphicon-remove"></span>
 								</a>
 							</div>
@@ -65,7 +72,7 @@
 							<span class='glyphicon glyphicon-volume-up'></span>
 						</div>
 						<div class='col-xs-10 fullwidth'>
-							<input type="text" id='bg-vol' class="slider col-xs-12" value="0.7" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="hide"></input>
+							<input type="text" id='bg-vol' class="slider col-xs-12" value="0.7" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0.7" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="hide" />
 						</div>
 					</div>
 				</div>
