@@ -18,6 +18,7 @@ var app = (function () {
 		this.frequency = 0;
 		this.volume = 70;
 		this.interval = null;
+		this.soundset = "All";
 		this.dom = this.genDom(this.name);
 	};
 	Sound.prototype.setFrequency = function(freq) {
@@ -52,12 +53,17 @@ var app = (function () {
 
 			var symbol = $('<div>').addClass('glyphicon glyphicon-play');
 			var span = $('<div>').addClass('soundLabel').text(name);
+			var delete_button = $('<a>').addClass('glyphicon glyphicon-remove btn').attr('style','right:5%; text-align: right; color: #d9534f; position:absolute').attr('href', '#')
+			var delete_div = $('<div>').addClass('pull-right').append(delete_button)
 			var a = $('<a>').addClass('btn btn-success btn-circle').append(symbol);
-			var div = $('<div>').addClass('col-xs-6 col-sm-4 col-md-3 centerize slim hidden')
-				.append(a).append(span).append(freqdiv).append(voldiv);
+			var div = $('<div>').addClass('col-xs-6 col-sm-4 col-md-3 centerize slim hidden').attr('style', 'position: relative;')
+				.append(delete_div).append(a).append(span).append(freqdiv).append(voldiv);
 			var obj = this; 
 			a.click(function(){
 				obj.play();
+			});
+			delete_button.click(function() {
+				obj.remove();
 			});
 			return div;
 	};
@@ -72,6 +78,17 @@ var app = (function () {
 	};
 	Sound.prototype.stop = function(){
 		this.sound.stop();
+	}
+	Sound.prototype.remove = function() {
+		this.sound.stop();
+		this.setFrequency(0);
+		this.dom.remove();
+		app.sound
+		index = app.sounds["All"].sounds.indexOf(this);
+		app.sounds["All"].sounds.splice(index, 1);
+		index2 = app.sounds[this.soundset].sounds.indexOf(this);
+		app.sounds[this.soundset].sounds.splice(index, 1);
+		delete this.buffer;
 	}
 	// Sound Sets
 	var Soundset = function(name) {
@@ -271,6 +288,7 @@ var app = (function () {
 		app.sounds["All"].sounds.push(audiosound);
 		app.sounds[app.soundset].sounds.push(audiosound);
 		app.soundsContainer.append(audiosound.dom);
+		audiosound.soundset = app.soundset;
 		audiosound.freqslider.slider({min:0,max:1,step:0.01,value:0.0,orientation:"horizontal",selection:"before",tooltip:"hide"});
 		audiosound.freqslider.slider().on('slide', function(ev){
 			var freq = ev.value
@@ -313,6 +331,7 @@ var app = (function () {
 				app.sounds["All"].sounds.push(audiosound);
 				app.sounds[soundsetname].sounds.push(audiosound);
 				app.soundsContainer.append(audiosound.dom);
+				audiosound.soundset = soundsetname;
 				audiosound.freqslider.slider({min:0,max:1,step:0.01,value:0.0,orientation:"horizontal",selection:"before",tooltip:"hide"});
 				audiosound.freqslider.slider().on('slide', function(ev){
 					var freq = ev.value

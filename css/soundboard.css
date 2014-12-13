@@ -19,7 +19,9 @@ body {
 .centerize{
 	text-align: center;
 }
-
+.well{
+	border-radius: 0px;
+}
 .hidden{
 	display: none;
 }
